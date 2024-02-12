@@ -3,7 +3,8 @@ import { CONFIG } from "./config/config";
 import { Player } from "./player/player";
 
 let interval: any;
-const users = new Map<string, ws.WebSocket>(); // 1.
+const users = new Map<string, ws.WebSocket>();
+// CREATE WS
 const server = new ws.WebSocketServer({ port: CONFIG.PORT }, () => {
   console.log(`Server started on port ${CONFIG.PORT}`);
   waitingRound();
@@ -27,13 +28,14 @@ server.on("connection", function (userSocket, _incomingMessage) {
   userSocket.on("message", function (rawMessage) {
     const message = rawMessage.toString();
     if (message === "BET") {
+      //MANAGE BET ACTION
       Player.updateBalance(50, userId, "bet");
-
       data = { balance: Player.getBalance(userId).balance };
       console.log(data.balance);
       userSocket.send(JSON.stringify(data));
     }
     if (message === "TAKE") {
+      // MANAGE TAKE ACTION
       Player.updateBalance(50 * currentMultiplier, userId, "add");
       Player.getBalance(userId);
       data = { balance: Player.getBalance(userId).balance };
@@ -41,11 +43,12 @@ server.on("connection", function (userSocket, _incomingMessage) {
       userSocket.send(JSON.stringify(data));
     }
   });
-
+// IF USER DISCONNECT DELETE IT FROM THE USER LIST
   userSocket.on("close", function (code, _reason) {
     users.delete(userId);
   });
 });
+// START NEW ROUND
 function startRound() {
   state = "running";
   users.forEach((user) => {
@@ -56,6 +59,7 @@ function startRound() {
   clearInterval(interval);
   multiplier();
 }
+// SEND MESSAGE TO THE PLAYER ON MULT UPDATE
 async function multiplier() {
   for (let index = 0; index <= getRandom(); index++) {
     currentMultiplier = index;
@@ -70,6 +74,7 @@ async function multiplier() {
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+// SEND END ROUND MESSAGE
 function endRound() {
   state = "end";
   users.forEach((user) => {
@@ -78,9 +83,11 @@ function endRound() {
   });
   interval = setInterval(waitingRound, 10000);
 }
+// RNG :)
 function getRandom() {
   return Math.floor(Math.random() * 100) + 1;
 }
+// SEND WAITING STATE TO THE PLAYERS
 function waitingRound() {
   clearInterval(interval);
   state = "waiting";
