@@ -1,0 +1,19 @@
+{
+  "name": "sample-ws-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc ./src/index.ts --outDir build",
+    "start": "node ./build/index.js",
+    "start:dev": "npm run build && npm run start"
+  },
+  "dependencies": {
+    "ts-loader": "^9.5.1",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.4",
+    "ts-node": "10.9.1",
+    "typescript": "^5.0.2"
+  }
+}
